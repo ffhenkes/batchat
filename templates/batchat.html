@@ -7,7 +7,7 @@
 <body>
 	<ul id="messages"></ul>
 	<form id="batform">
-		<input type="text" id="batmessage" value="Your message here.."/><br>
+		<textarea id="batmessage"></textarea><br>
 		<input type="submit" value="Send" />
 	</form>
 </body>
@@ -17,23 +17,19 @@
 <script>
 	$(function() {
 		var socket = null;
-		var batform = $("batform");
-		var batmessage = $("#batmessage").attr("value");
+		var batform = $("#batform textarea");
 		var messages = $("#messages");
 
-		$("batform").submit(function() {
+		$("#batform").submit(function() {
 			if (!batform.val()) return false;
 			if (!socket) {
 				console.log("Error: No connection!");
 				return false;
 			}
-			
-			if (batmessage !== "" && batmessage !== "Your message here..") {
-				socket.send(batmessage);
-				batmessage = "";
-				return false;
-			}
-			
+
+			socket.send(batform.val());
+			batform.val("");
+			return false;
 		});
 
 		if (!window["WebSocket"]) {
@@ -43,8 +39,6 @@
 		else {
 			socket = new WebSocket("ws://localhost:8000/batcave");
 			
-			console.log("#1");
-			console.log(socket);
 			socket.onclose = function() {
 				console.log('Connection closed!')
 			}
