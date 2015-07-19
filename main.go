@@ -3,23 +3,28 @@ package main
 import (
 	"log"
 	"net/http"
+	"path/filepath"
+	"sync"
+	"text/template"
 )
 
-func main() {
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte(`
-		<html>
-			<head>
-				<title>The Bat Chat</title>
-			</head>
-			<body>
-				Bat Chat!!
-			</body>
-		</html>
-		`))
+type templateHandler struct {
+	once     sync.Once
+	filename string
+	templ    *template.Template
+}
+
+func (t *templateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	t.once.Do(func() {
+		t.templ = template.Must(template.ParseFiles(filepath.Join("templates", t.filename)))
 	})
 
-	// serve
+	t.templ.Execute(w, nil)
+}
+
+func main() {
+	http.Handle("/", &templateHandler{filename: "batchat.html"})
+
 	if err := http.ListenAndServe(":8000", nil); err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}
