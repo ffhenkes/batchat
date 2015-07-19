@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"log"
 	"net/http"
 	"path/filepath"
@@ -19,10 +20,13 @@ func (t *templateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		t.templ = template.Must(template.ParseFiles(filepath.Join("templates", t.filename)))
 	})
 
-	t.templ.Execute(w, nil)
+	t.templ.Execute(w, r)
 }
 
 func main() {
+
+	var addr = flag.String("addr", ":8000", "Batcave entry.")
+	flag.Parse()
 
 	bcave := newCave()
 	http.Handle("/", &templateHandler{filename: "batchat.html"})
@@ -30,9 +34,9 @@ func main() {
 
 	// get the batcave going
 	go bcave.run()
-	log.Println("The Batcave Chat is rolling on!!")
+	log.Println("The Batcave Chat is rolling on port", *addr)
 
-	if err := http.ListenAndServe(":8000", nil); err != nil {
+	if err := http.ListenAndServe(*addr, nil); err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}
 }

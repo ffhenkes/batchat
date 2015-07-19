@@ -37,7 +37,7 @@
 		}
 
 		else {
-			socket = new WebSocket("ws://localhost:8000/batcave");
+			socket = new WebSocket("ws://{{.Host}}/batcave");
 			
 			socket.onclose = function() {
 				console.log('Connection closed!')
