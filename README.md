@@ -15,7 +15,7 @@ $ batchat --addr="addr:PORT"
 
 ```
 
-### Open in a browser
+### Open two tabs in a browser..
 
 ```
 http://addr:PORT
