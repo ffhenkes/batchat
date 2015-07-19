@@ -1,8 +1,58 @@
+
+<!DOCTYPE html>
 <html>
-	<head>
-		<title>The Bat Chat</title>
-	</head>
-	<body>
-		Bat Chat!!
-	</body>
+<head>
+	<title>The Bat Chat</title>
+</head>
+<body>
+	<ul id="messages"></ul>
+	<form id="batform">
+		<input type="text" id="batmessage" value="Your message here.."/><br>
+		<input type="submit" value="Send" />
+	</form>
+</body>
 </html>
+
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+<script>
+	$(function() {
+		var socket = null;
+		var batform = $("batform");
+		var batmessage = $("#batmessage").attr("value");
+		var messages = $("#messages");
+
+		$("batform").submit(function() {
+			if (!batform.val()) return false;
+			if (!socket) {
+				console.log("Error: No connection!");
+				return false;
+			}
+			
+			if (batmessage !== "" && batmessage !== "Your message here..") {
+				socket.send(batmessage);
+				batmessage = "";
+				return false;
+			}
+			
+		});
+
+		if (!window["WebSocket"]) {
+			console.log("Not a batbrowser! Access denied!!");
+		}
+
+		else {
+			socket = new WebSocket("ws://localhost:8000/batcave");
+			
+			console.log("#1");
+			console.log(socket);
+			socket.onclose = function() {
+				console.log('Connection closed!')
+			}
+
+			socket.onmessage = function(e) {
+				messages.append($("<li>").text(e.data));
+			}
+		}
+	});
+	
+</script>

@@ -23,8 +23,14 @@ func (t *templateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+
+	bcave := newCave()
 	http.Handle("/", &templateHandler{filename: "batchat.html"})
-	log.Println("The BatCave Chat is rolling on!!")
+	http.Handle("/batcave", bcave)
+
+	// get the batcave going
+	go bcave.run()
+	log.Println("The Batcave Chat is rolling on!!")
 
 	if err := http.ListenAndServe(":8000", nil); err != nil {
 		log.Fatal("ListenAndServe: ", err)

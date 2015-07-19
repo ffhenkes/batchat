@@ -16,6 +16,15 @@ type batcave struct {
 	batclients map[*batclient]bool
 }
 
+func newCave() *batcave {
+	return &batcave{
+		forward:    make(chan []byte),
+		join:       make(chan *batclient),
+		leave:      make(chan *batclient),
+		batclients: make(map[*batclient]bool),
+	}
+}
+
 func (bcave *batcave) run() {
 	for {
 		select {
