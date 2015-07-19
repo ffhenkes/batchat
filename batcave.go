@@ -1,5 +1,11 @@
 package main
 
+import (
+	"github.com/gorilla/websocket"
+	"log"
+	"net/http"
+)
+
 type batcave struct {
 	forward chan []byte
 
@@ -35,4 +41,35 @@ func (bcave *batcave) run() {
 
 		}
 	}
+}
+
+const (
+	socketBufferSize  = 1024
+	messageBufferSize = 256
+)
+
+var upgrader = &websocket.Upgrader{ReadBufferSize: socketBufferSize, WriteBufferSize: socketBufferSize}
+
+func (bcave *batcave) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+	socket, err := upgrader.Upgrade(w, req, nil)
+
+	if err != nil {
+		log.Fatal("ServeHTTP", err)
+		return
+	}
+
+	batclient := &batclient{
+		socket:  socket,
+		send:    make(chan []byte, messageBufferSize),
+		batcave: bcave,
+	}
+
+	bcave.join <- batclient
+
+	defer func() {
+		bcave.leave <- batclient
+	}()
+
+	go batclient.write()
+	batclient.read()
 }
