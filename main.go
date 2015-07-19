@@ -24,6 +24,7 @@ func (t *templateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	http.Handle("/", &templateHandler{filename: "batchat.html"})
+	log.Println("The BatCave Chat is rolling on!!")
 
 	if err := http.ListenAndServe(":8000", nil); err != nil {
 		log.Fatal("ListenAndServe: ", err)
