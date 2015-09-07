@@ -4,9 +4,12 @@ import (
 	"flag"
 	"log"
 	"net/http"
+	"os"
 	"path/filepath"
 	"sync"
 	"text/template"
+
+	"github.com/ffhenkes/battrack"
 )
 
 type templateHandler struct {
@@ -29,6 +32,8 @@ func main() {
 	flag.Parse()
 
 	bcave := newCave()
+	bcave.battracker = battrack.New(os.Stdout)
+
 	http.Handle("/", &templateHandler{filename: "batchat.html"})
 	http.Handle("/batcave", bcave)
 

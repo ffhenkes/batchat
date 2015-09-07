@@ -1,9 +1,11 @@
 package main
 
 import (
-	"github.com/gorilla/websocket"
 	"log"
 	"net/http"
+
+	"github.com/ffhenkes/battrack"
+	"github.com/gorilla/websocket"
 )
 
 type batcave struct {
@@ -14,6 +16,8 @@ type batcave struct {
 	leave chan *batclient
 
 	batclients map[*batclient]bool
+
+	battracker battrack.BatTracker
 }
 
 func newCave() *batcave {
@@ -26,25 +30,30 @@ func newCave() *batcave {
 }
 
 func (bcave *batcave) run() {
+
 	for {
 		select {
 		case batclient := <-bcave.join:
 			// joining
 			bcave.batclients[batclient] = true
+			bcave.battracker.Trace("New client joined")
 		case batclient := <-bcave.leave:
 			// leaving
 			delete(bcave.batclients, batclient)
 			close(batclient.send)
+			bcave.battracker.Trace("Client left")
 		case msg := <-bcave.forward:
 			// all clients
 			for batclient := range bcave.batclients {
 				select {
 				case batclient.send <- msg:
+					bcave.battracker.Trace(" -- sent to client")
 					// send the message
 				default:
 					// failed
 					delete(bcave.batclients, batclient)
 					close(batclient.send)
+					bcave.battracker.Trace(" -- failed to send, cleaned up client")
 				}
 			}
 
