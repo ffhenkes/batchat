@@ -1,5 +1,7 @@
 # Batchat
 
+[WIP]
+
 Batchat is a simple chat example of a go server with websocket features using [gorilla](https://github.com/gorilla/websocket). 
 
 Also a simple html/jquery interface is used to demonstrate the functionality on a web page.
@@ -18,7 +20,4 @@ $ batchat --addr="addr:PORT"
 ### Open two tabs in a browser..
 
 ```
-http://addr:PORT
-```
-
-Work in progress..
+http://addr:port
