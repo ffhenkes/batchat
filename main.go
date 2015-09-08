@@ -31,10 +31,14 @@ func main() {
 	var addr = flag.String("addr", ":8000", "Batcave entry.")
 	flag.Parse()
 
+	// batchat has just one room which is the batcave
 	bcave := newCave()
 	bcave.battracker = battrack.New(os.Stdout)
 
-	http.Handle("/", &templateHandler{filename: "batchat.html"})
+	// routes
+	http.Handle("/login", &templateHandler{filename: "login.html"})
+	http.HandleFunc("/auth/", loginHandler)
+	http.Handle("/batchat", MustAuth(&templateHandler{filename: "batchat.html"}))
 	http.Handle("/batcave", bcave)
 
 	// get the batcave going
